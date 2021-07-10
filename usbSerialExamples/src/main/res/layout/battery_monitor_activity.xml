@@ -492,7 +492,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:textColor="@color/textColorLight"
+                        android:textColor="@color/textColorDark"
                         android:text="Temperature1: "
                         android:textSize="16sp"/>
 
@@ -501,7 +501,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:textColor="@color/textColorLight"
+                        android:textColor="@color/textColorDark"
                         android:text="Temperature2: "
                         android:textSize="16sp"/>
 
@@ -510,7 +510,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:textColor="@color/textColorLight"
+                        android:textColor="@color/textColorDark"
                         android:text="warning!"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -546,6 +546,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="10dp"
                     android:layout_below="@id/leakage_title"
+                    android:textColor="@color/textColorDark"
                     android:textSize="16sp"
                     android:text="Normal"/>
 
