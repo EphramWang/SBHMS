@@ -28,6 +28,8 @@ import android.widget.ToggleButton;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.model.PressureDataPack;
+import com.hoho.android.usbserial.model.VoltageDataPack;
 import com.hoho.android.usbserial.util.HexDump;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
@@ -299,13 +301,13 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         if (data.length == DataConstants.DATA_LENGTH_VOLTAGE) {
             if (data[0] == DataConstants.FRAME_HEAD && data[data.length - 1] == DataConstants.FRAME_TAIL && data[1] == DataConstants.command_voltage) {
                 //数据帧之 电压
-                BatteryMonitorActivity.VoltageDataPack dataPackage = new BatteryMonitorActivity.VoltageDataPack(System.currentTimeMillis(), data);
+                VoltageDataPack dataPackage = new VoltageDataPack(System.currentTimeMillis(), data);
                 Toast.makeText(getActivity(), dataPackage.toString(), Toast.LENGTH_SHORT).show();
             }
         } else if (data.length == DataConstants.DATA_LENGTH_PRESSURE) {
             if (data[0] == DataConstants.FRAME_HEAD && data[data.length - 1] == DataConstants.FRAME_TAIL && data[1] == DataConstants.command_pressure) {
                 //数据帧之 pressure
-                BatteryMonitorActivity.PressureDataPack dataPackage = new BatteryMonitorActivity.PressureDataPack(System.currentTimeMillis(), data);
+                PressureDataPack dataPackage = new PressureDataPack(System.currentTimeMillis(), data);
                 Toast.makeText(getActivity(), dataPackage.toString(), Toast.LENGTH_SHORT).show();
             }
         }

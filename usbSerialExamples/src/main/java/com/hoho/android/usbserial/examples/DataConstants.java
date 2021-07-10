@@ -14,6 +14,9 @@ public class DataConstants {
     public static final int DATA_COUNT_3MIN = 180;
     public static final int DATA_COUNT_10MIN = 600;
 
+    public static final int BATTERY_COUNT = 6;
+
+
 
     public static byte getCheckSumByte(byte[] byteArray) {
         int sum = 0;

@@ -7,8 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 
-import com.hoho.android.usbserial.examples.BatteryMonitorActivity;
 import com.hoho.android.usbserial.examples.R;
+import com.hoho.android.usbserial.model.VoltageDataPack;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class BatteryMonChart extends ChartBase {
 
     int[] colorList = {R.color.battery1, R.color.battery2, R.color.battery3, R.color.battery4, R.color.battery5, R.color.battery6};
 
-    private ArrayList<BatteryMonitorActivity.VoltageDataPack> voltageDataList;
+    private ArrayList<VoltageDataPack> voltageDataList;
 
     public BatteryMonChart(Context context) {
         super(context);
@@ -70,7 +70,7 @@ public class BatteryMonChart extends ChartBase {
         float y = (mainRect.top + mainRect.bottom) / 2f;
         float xDiff = mainRect.width() / (mCount - 1);
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
-            BatteryMonitorActivity.VoltageDataPack voltageDataPack = voltageDataList.get(i);
+            VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < BAT_COUNT; j++) {
                 y = mainRect.top + mainRect.height() * (sBatteryMaxVol - voltageDataPack.voltageList[j]) / (sBatteryMaxVol - sBatteryMinVol);
                 if (pathList[j].isEmpty()) {
@@ -102,7 +102,7 @@ public class BatteryMonChart extends ChartBase {
         return Math.round(num);
     }
 
-    public void setVoltageDataList(ArrayList<BatteryMonitorActivity.VoltageDataPack> voltageDataList) {
+    public void setVoltageDataList(ArrayList<VoltageDataPack> voltageDataList) {
         this.voltageDataList = voltageDataList;
         postInvalidate();
     }

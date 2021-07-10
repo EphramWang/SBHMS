@@ -1,7 +1,7 @@
 package com.hoho.android.usbserial.chart;
 
-import com.hoho.android.usbserial.examples.BatteryMonitorActivity;
+import com.hoho.android.usbserial.model.DataPack;
 
 public interface TouchCallBack {
-    void onTouch(BatteryMonitorActivity.DataPack dataPack1, BatteryMonitorActivity.DataPack dataPack2);
+    void onTouch(DataPack dataPack1, DataPack dataPack2);
 }

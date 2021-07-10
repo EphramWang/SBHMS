@@ -28,6 +28,9 @@ import com.hoho.android.usbserial.chart.TouchCallBack;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.model.DataPack;
+import com.hoho.android.usbserial.model.PressureDataPack;
+import com.hoho.android.usbserial.model.VoltageDataPack;
 import com.hoho.android.usbserial.util.HexDump;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
@@ -75,13 +78,12 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     public static float sBatteryMaxVol = 4.2f;
     public static float sBatteryMinVol = 2.75f;
 
-    public static final int BATTERY_COUNT = 6;
 
     /**
      * datas
      */
-    private float[] mBatteryVoltages = new float[BATTERY_COUNT];//电池电压的数据需要进行除以10000的处理
-    private int[] mBatteryPercents = new int[BATTERY_COUNT];
+    private float[] mBatteryVoltages = new float[DataConstants.BATTERY_COUNT];//电池电压的数据需要进行除以10000的处理
+    private int[] mBatteryPercents = new int[DataConstants.BATTERY_COUNT];
     private int mTemperature1 = 0;//温度传感器的阻值，结果需要进行除以100的处理
     private int mTemperature2 = 0;
     private long mLeakage = 0;//泄漏传感器电压的数据,需要进行除以10的处理，得到的结果其单位V，
@@ -94,9 +96,9 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     /**
      * views
      */
-    private TextView[] mBatteryVoltageTvs = new TextView[BATTERY_COUNT];
-    private TextView[] mBatteryPercentTvs = new TextView[BATTERY_COUNT];
-    private ProgressBar[] mBatteryProgressBars = new ProgressBar[BATTERY_COUNT];
+    private TextView[] mBatteryVoltageTvs = new TextView[DataConstants.BATTERY_COUNT];
+    private TextView[] mBatteryPercentTvs = new TextView[DataConstants.BATTERY_COUNT];
+    private ProgressBar[] mBatteryProgressBars = new ProgressBar[DataConstants.BATTERY_COUNT];
 
     private CirCleProgressBar mPressureProgressBar;
     private TextView mPressureStatusTv;
@@ -110,7 +112,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
     private BatteryMonChart mChart1;
     private TempMonChart mChart2;
-    private TextView[] mCellTvs = new TextView[BATTERY_COUNT];
+    private TextView[] mCellTvs = new TextView[DataConstants.BATTERY_COUNT];
     private TextView mTemp1Tv;
     private TextView mTemp2Tv;
     private TextView mPressure1Tv;
@@ -187,7 +189,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             public void onTouch(DataPack dataPack1, DataPack dataPack2) {
                 mainLooper.post(() -> {
                     if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).voltageList != null) {
-                        for (int i = 0; i < BATTERY_COUNT; i++) {
+                        for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
                             mCellTvs[i].setText("Cell" + (i + 1) + ": " + ((VoltageDataPack) dataPack1).voltageList[i] + "V");
                         }
                     }
@@ -269,7 +271,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         float[] testVot = {2.8f, 4.1f, 3.0f, 3.8f, 3f, 3,4f};
         int[] testP = {20, 33, 44, 32, 76, 43};
 
-        for (int i = 0; i < BATTERY_COUNT; i++) {
+        for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
             mBatteryVoltages[i] = testVot[i];
             mBatteryPercents[i] = testP[i];
         }
@@ -441,7 +443,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                 mVoltageDataList.add(dataPackage);
                 mTemperature1 = dataPackage.tempList[0];
                 mTemperature2 = dataPackage.tempList[1];
-                for (int i = 0; i < BATTERY_COUNT; i++) {
+                for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
                     mBatteryVoltages[i] = dataPackage.voltageList[i] / 10000f;
                 }
                 updateStatus();
@@ -490,7 +492,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
     @SuppressLint("NewApi")
     private void updateStatus() {
-        for (int i = 0; i < BATTERY_COUNT; i++) {
+        for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
             mBatteryVoltageTvs[i].setText(mBatteryVoltages[i] + "V");
             mBatteryPercentTvs[i].setText(mBatteryPercents[i] + "%");
             mBatteryProgressBars[i].setProgress(mBatteryPercents[i]);
@@ -528,83 +530,6 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         }
     }
 
-    public static class DataPack {
-        public static final int DATA_START = 4;
-
-        public long timestamp;
-        public byte[] dataBytes;
-        public boolean isValid = true;
-
-        public DataPack(long timestamp, byte[] dataBytes) {
-            this.timestamp = timestamp;
-            this.dataBytes = dataBytes;
-        }
-
-        public boolean isCheckSumOK() {
-            int sum = 0;
-            for (int i = 1; i < dataBytes.length - 1; i++) {
-                sum += dataBytes[i];
-            }
-            return sum == 0;
-        }
-    }
-    public static class VoltageDataPack extends DataPack {
-        public short[] voltageList = new short[BATTERY_COUNT];
-        public short[] tempList = new short[2];
-
-        public VoltageDataPack(long timestamp, byte[] dataBytes) {
-            super(timestamp, dataBytes);
-            if (dataBytes.length == DataConstants.DATA_LENGTH_VOLTAGE) {
-                for (int i = 0; i < voltageList.length; i++) {
-                    voltageList[i] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + i * 2);
-                }
-                tempList[0] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 12);
-                tempList[1] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 14);
-            }
-        }
-
-        public VoltageDataPack(long timestamp, byte[] dataBytes, short[] voltageList, short[] tempList) {
-            super(timestamp, dataBytes);
-            this.voltageList = voltageList;
-            this.tempList = tempList;
-        }
-
-        @Override
-        public String toString() {
-            return "VoltageDataPack{" +
-                    "voltageList=" + Arrays.toString(voltageList) +
-                    ", tempList=" + Arrays.toString(tempList) +
-                    '}';
-        }
-    }
-
-    public static class PressureDataPack extends DataPack {
-        public short pressure;
-        public short leakage;
-
-        public PressureDataPack(long timestamp, byte[] dataBytes) {
-            super(timestamp, dataBytes);
-            if (dataBytes.length == DataConstants.DATA_LENGTH_PRESSURE) {
-                pressure = Utils.byteArrayToShort(dataBytes, DATA_START + 4);
-                leakage = Utils.byteArrayToShort(dataBytes, DATA_START + 6);
-            }
-        }
-
-        public PressureDataPack(long timestamp, byte[] dataBytes, short pressure, short leakage) {
-            super(timestamp, dataBytes);
-            this.pressure = pressure;
-            this.leakage = leakage;
-        }
-
-        @Override
-        public String toString() {
-            return "PressureDataPack{" +
-                    "pressure=" + pressure +
-                    ", leakage=" + leakage +
-                    '}';
-        }
-    }
-
     public static class receivePackEvent {
         public DataPack dataPack;
         public receivePackEvent(DataPack dataPack) {
@@ -612,12 +537,4 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         }
     }
 
-    class ReadSerialPortThread extends Thread {
-        @Override
-        public void run() {
-            while (!isInterrupted()) {
-
-            }
-        }
-    }
 }

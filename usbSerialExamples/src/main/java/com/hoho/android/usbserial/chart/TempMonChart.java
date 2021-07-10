@@ -7,8 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 
-import com.hoho.android.usbserial.examples.BatteryMonitorActivity;
 import com.hoho.android.usbserial.examples.R;
+import com.hoho.android.usbserial.model.PressureDataPack;
+import com.hoho.android.usbserial.model.VoltageDataPack;
 
 import java.util.ArrayList;
 
@@ -44,8 +45,8 @@ public class TempMonChart extends ChartBase {
         super(context, attrs, defStyleAttr);
     }
 
-    private ArrayList<BatteryMonitorActivity.VoltageDataPack> voltageDataList;
-    private ArrayList<BatteryMonitorActivity.PressureDataPack> pressureDataList;
+    private ArrayList<VoltageDataPack> voltageDataList;
+    private ArrayList<PressureDataPack> pressureDataList;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -70,7 +71,7 @@ public class TempMonChart extends ChartBase {
         float y = (mainRect.top + mainRect.bottom) / 2f;
         float xDiff = mainRect.width() / (mCount - 1);
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
-            BatteryMonitorActivity.VoltageDataPack voltageDataPack = voltageDataList.get(i);
+            VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < TEMP_COUNT; j++) {
                 y = mainRect.top + mainRect.height() * (sTempMax - voltageDataPack.tempList[j]) / (sTempMax - sTempMin);
                 if (pathList[j].isEmpty()) {
@@ -84,7 +85,7 @@ public class TempMonChart extends ChartBase {
 
         x = mainRect.right;
         for (int i = pressureDataList.size() - 1; i >=0; i--) {
-            BatteryMonitorActivity.PressureDataPack pressureDataPack = pressureDataList.get(i);
+            PressureDataPack pressureDataPack = pressureDataList.get(i);
             y = mainRect.top + mainRect.height() * (sPressureMax - pressureDataPack.pressure) / (sPressureMax - sPressureMin);
             if (pathList[2].isEmpty()) {
                 pathList[2].moveTo(x, y);
@@ -107,12 +108,12 @@ public class TempMonChart extends ChartBase {
         }
     }
 
-    public void setVoltageDataList(ArrayList<BatteryMonitorActivity.VoltageDataPack> voltageDataList) {
+    public void setVoltageDataList(ArrayList<VoltageDataPack> voltageDataList) {
         this.voltageDataList = voltageDataList;
         postInvalidate();
     }
 
-    public void setPressureDataList(ArrayList<BatteryMonitorActivity.PressureDataPack> pressureDataList) {
+    public void setPressureDataList(ArrayList<PressureDataPack> pressureDataList) {
         this.pressureDataList = pressureDataList;
         postInvalidate();
     }
