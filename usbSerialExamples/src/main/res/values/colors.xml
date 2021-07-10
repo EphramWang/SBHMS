@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#949C29</color>
+    <color name="colorPrimaryDark">#61671B</color>
+    <color name="colorAccent">#D8E33B</color>
+
+    <color name="colorRecieveText">#00FF00</color>
+    <color name="colorSendText">#82CAFF</color>
+    <color name="colorStatusText">#FFDB58</color>
+
+
+
+
+
+    <color name="bgLight">#292938</color>
+    <color name="bgDark">#283040</color>
+    <color name="textColorLight">#C4CFDD</color>
+    <color name="textColorDark">#97A4BA</color>
+
+
+    <color name="battery1">#CE0000</color>
+    <color name="battery2">#0000C6</color>
+    <color name="battery3">#009100</color>
+    <color name="battery4">#EAC100</color>
+    <color name="battery5">#8600FF</color>
+    <color name="battery6">#FF359A</color>
+</resources>
