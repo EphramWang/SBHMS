@@ -148,7 +148,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
         //初始化界面
         setContentView(R.layout.battery_monitor_activity);
-        receiveText = findViewById(R.id.title);
+        //receiveText = findViewById(R.id.title);
         mBatteryVoltageTvs[0] = (TextView) findViewById(R.id.voltage1);
         mBatteryVoltageTvs[1] = (TextView) findViewById(R.id.voltage2);
         mBatteryVoltageTvs[2] = (TextView) findViewById(R.id.voltage3);
@@ -408,7 +408,8 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             spn.append("send " + data.length + " bytes\n");
             spn.append(HexDump.dumpHexString(data)).append("\n");
             spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorSendText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            receiveText.append(spn);
+            if (receiveText != null)
+                receiveText.append(spn);
             usbSerialPort.write(data, WRITE_WAIT_MILLIS);
         } catch (Exception e) {
             onRunError(e);
@@ -437,7 +438,8 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         spn.append("receive " + data.length + " bytes\n");
         if(data.length > 0)
             spn.append(HexDump.dumpHexString(data)).append("\n");
-        receiveText.append(spn);
+        if (receiveText != null)
+            receiveText.append(spn);
         Log.e("wtrace", "received: " + HexDump.dumpHexString(data));
     }
 
@@ -471,7 +473,8 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     void status(String str) {
         SpannableStringBuilder spn = new SpannableStringBuilder(str+'\n');
         spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorStatusText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        receiveText.append(spn);
+        if (receiveText != null)
+            receiveText.append(spn);
         Log.e("wtrace", "status: " + spn);
     }
 
