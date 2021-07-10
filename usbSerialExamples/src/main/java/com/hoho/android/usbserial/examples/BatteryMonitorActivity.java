@@ -138,7 +138,13 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         portNum = getIntent().getExtras().getInt("port");
         baudRate = getIntent().getExtras().getInt("baud");
         withIoManager = getIntent().getExtras().getBoolean("withIoManager");
-        //Toast.makeText(getApplicationContext(), deviceId + portNum + baudRate + " !!", Toast.LENGTH_LONG).show();
+        if (deviceId == 0 && portNum == 0 && baudRate ==0) {
+            deviceId = 1002;
+            portNum = 0;
+            baudRate = 115200;
+            withIoManager = true;
+        }
+        //Toast.makeText(getApplicationContext(), "device:" + deviceId + " port:" + portNum + " baud:" + baudRate + "  connected!!", Toast.LENGTH_LONG).show();
 
         //初始化界面
         setContentView(R.layout.battery_monitor_activity);
@@ -528,6 +534,9 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         if (!mChart2.isIsDrawLine()) {
             mPressure1Tv.setText("Pressure: " + mPressure + "Bar");
         }
+
+        mChart1.invalidate();
+        mChart2.invalidate();
     }
 
     public static class receivePackEvent {
