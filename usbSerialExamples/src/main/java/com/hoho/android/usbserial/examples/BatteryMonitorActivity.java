@@ -179,7 +179,9 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                 mainLooper.post(() -> {
                     if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).voltageListDisplay != null) {
                         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
-                            mCellTvs[i].setText("Cell" + (i + 1) + ": " + ((VoltageDataPack) dataPack1).voltageListDisplay[i] + "V");
+                            float vol = ((VoltageDataPack) dataPack1).voltageListDisplay[i];
+                            String volStr = String.format("%.2f", vol);
+                            mCellTvs[i].setText("Cell" + (i + 1) + ": " + volStr + "V");
                         }
                     }
                 });
