@@ -88,9 +88,10 @@ public class CirCleProgressBar extends View {
         textPaint.setAntiAlias(true);
         textPaint.setColor(textColor);
         textPaint.setTextSize(textSize);
-        float textWidth = textPaint.measureText((int) currentProgress + "");
+        String displayProgress = String.format("%.2f", currentProgress);
+        float textWidth = textPaint.measureText(displayProgress + "Bar");
         if(!isDefaultText) {
-            canvas.drawText(String.valueOf((int)currentProgress), centre - textWidth / 2, centre + textSize / 2, textPaint);
+            canvas.drawText(String.valueOf(displayProgress) + "Bar", centre - textWidth / 2, centre + textSize / 2, textPaint);
         }else {
             canvas.drawText(mTextValue, centre - textWidth / 2, centre + textSize / 2, textPaint);
         }

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 
+import com.hoho.android.usbserial.examples.DataConstants;
 import com.hoho.android.usbserial.examples.R;
 import com.hoho.android.usbserial.model.PressureDataPack;
 import com.hoho.android.usbserial.model.VoltageDataPack;
@@ -14,11 +15,6 @@ import com.hoho.android.usbserial.model.VoltageDataPack;
 import java.util.ArrayList;
 
 import androidx.annotation.Nullable;
-
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sPressureMax;
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sPressureMin;
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sTempMax;
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sTempMin;
 
 
 public class TempMonChart extends ChartBase {
@@ -73,7 +69,7 @@ public class TempMonChart extends ChartBase {
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
             VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < TEMP_COUNT; j++) {
-                y = mainRect.top + mainRect.height() * (sTempMax - voltageDataPack.tempList[j]) / (sTempMax - sTempMin);
+                y = mainRect.top + mainRect.height() * (DataConstants.TEMP_MAX - voltageDataPack.tempListDisplay[j]) / (DataConstants.TEMP_MAX - DataConstants.TEMP_MIN);
                 if (pathList[j].isEmpty()) {
                     pathList[j].moveTo(x, y);
                 } else {
@@ -86,7 +82,7 @@ public class TempMonChart extends ChartBase {
         x = mainRect.right;
         for (int i = pressureDataList.size() - 1; i >=0; i--) {
             PressureDataPack pressureDataPack = pressureDataList.get(i);
-            y = mainRect.top + mainRect.height() * (sPressureMax - pressureDataPack.pressure) / (sPressureMax - sPressureMin);
+            y = mainRect.top + mainRect.height() * (DataConstants.PRESSURE_MAX - pressureDataPack.pressureDisplay) / (DataConstants.PRESSURE_MAX - DataConstants.PRESSURE_MIN);
             if (pathList[2].isEmpty()) {
                 pathList[2].moveTo(x, y);
             } else {

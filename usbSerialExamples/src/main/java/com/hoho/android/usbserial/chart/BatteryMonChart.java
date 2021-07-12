@@ -7,15 +7,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 
+import com.hoho.android.usbserial.examples.DataConstants;
 import com.hoho.android.usbserial.examples.R;
 import com.hoho.android.usbserial.model.VoltageDataPack;
 
 import java.util.ArrayList;
 
 import androidx.annotation.Nullable;
-
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sBatteryMaxVol;
-import static com.hoho.android.usbserial.examples.BatteryMonitorActivity.sBatteryMinVol;
 
 
 public class BatteryMonChart extends ChartBase {
@@ -72,7 +70,7 @@ public class BatteryMonChart extends ChartBase {
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
             VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < BAT_COUNT; j++) {
-                y = mainRect.top + mainRect.height() * (sBatteryMaxVol - voltageDataPack.voltageList[j]) / (sBatteryMaxVol - sBatteryMinVol);
+                y = mainRect.top + mainRect.height() * (DataConstants.Battery_MaxVol - voltageDataPack.voltageListDisplay[j]) / (DataConstants.Battery_MaxVol - DataConstants.Battery_MinVol);
                 if (pathList[j].isEmpty()) {
                     pathList[j].moveTo(x, y);
                 } else {

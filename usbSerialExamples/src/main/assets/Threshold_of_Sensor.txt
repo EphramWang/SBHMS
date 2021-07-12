@@ -1,0 +1,8 @@
+;阈值对应
+[Threshold]
+Threshold.Pressure = 8.3
+Threshold.Temperature1.min = -40
+Threshold.Temperature1.max = 85
+Threshold.Temperature2.min = -40
+Threshold.Temperature2.max = 85
+Threshold.Leakage = 1.7

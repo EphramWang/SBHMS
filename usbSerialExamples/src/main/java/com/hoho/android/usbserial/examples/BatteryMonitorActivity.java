@@ -53,7 +53,6 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
     private int deviceId, portNum, baudRate;
     private boolean withIoManager;
-
     private BroadcastReceiver broadcastReceiver;
     private Handler mainLooper;
     private TextView receiveText;
@@ -63,32 +62,15 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     private UsbPermission usbPermission = UsbPermission.Unknown;
     private boolean connected = false;
 
-
-    public static short sPressureThreshold = 2900;
-    public static short sLeakageThreshold = 9000;
-
-    public static int sTemperature1Threshold = 135;
-    public static int sTemperature2Threshold = 135;
-
-    public static int sTempMax = 80;
-    public static int sTempMin = -40;
-    public static int sPressureMax = 4000;//todo
-    public static int sPressureMin = 0;//todo
-
-    public static float sBatteryMaxVol = 4.2f;
-    public static float sBatteryMinVol = 2.75f;
-
-
     /**
      * datas
      */
-    private float[] mBatteryVoltages = new float[DataConstants.BATTERY_COUNT];//电池电压的数据需要进行除以10000的处理
+    private float[] mBatteryVoltages = new float[DataConstants.BATTERY_COUNT];
     private int[] mBatteryPercents = new int[DataConstants.BATTERY_COUNT];
-    private int mTemperature1 = 0;//温度传感器的阻值，结果需要进行除以100的处理
+    private int mTemperature1 = 0;
     private int mTemperature2 = 0;
-    private long mLeakage = 0;//泄漏传感器电压的数据,需要进行除以10的处理，得到的结果其单位V，
-    private long mPressure = 0;//压力传感器电容数据,需要进行除以10的处理，得到的结果其单位为nF
-    private long mMaxPressure = 3000;
+    private float mLeakage = 0f;
+    private float mPressure = 0f;
 
     private ArrayList<VoltageDataPack> mVoltageDataList = new ArrayList<>();
     private ArrayList<PressureDataPack> mPressureDataList = new ArrayList<>();
@@ -146,6 +128,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         }
         //Toast.makeText(getApplicationContext(), "device:" + deviceId + " port:" + portNum + " baud:" + baudRate + "  connected!!", Toast.LENGTH_LONG).show();
 
+        DataConstants.initConfig(getApplicationContext());
         //初始化界面
         setContentView(R.layout.battery_monitor_activity);
         //receiveText = findViewById(R.id.title);
@@ -194,9 +177,9 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             @Override
             public void onTouch(DataPack dataPack1, DataPack dataPack2) {
                 mainLooper.post(() -> {
-                    if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).voltageList != null) {
+                    if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).voltageListDisplay != null) {
                         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
-                            mCellTvs[i].setText("Cell" + (i + 1) + ": " + ((VoltageDataPack) dataPack1).voltageList[i] + "V");
+                            mCellTvs[i].setText("Cell" + (i + 1) + ": " + ((VoltageDataPack) dataPack1).voltageListDisplay[i] + "V");
                         }
                     }
                 });
@@ -205,12 +188,12 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         mChart2.setTouchCallBack(new TouchCallBack() {
             @Override
             public void onTouch(DataPack dataPack1, DataPack dataPack2) {
-                if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).tempList != null) {
-                    mTemp1Tv.setText("Temperature1:" + ((VoltageDataPack) dataPack1).tempList[0] + "°C");
-                    mTemp2Tv.setText("Temperature2:" + ((VoltageDataPack) dataPack1).tempList[1] + "°C");
+                if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).tempListDisplay != null) {
+                    mTemp1Tv.setText("Temperature1:" + ((VoltageDataPack) dataPack1).tempListDisplay[0] + "°C");
+                    mTemp2Tv.setText("Temperature2:" + ((VoltageDataPack) dataPack1).tempListDisplay[1] + "°C");
                 }
                 if (dataPack2 instanceof PressureDataPack) {
-                    mPressure1Tv.setText("Pressure: " + ((PressureDataPack) dataPack2).pressure + "Bar");
+                    mPressure1Tv.setText("Pressure: " + ((PressureDataPack) dataPack2).pressureDisplay + "Bar");
                 }
             }
         });
@@ -252,17 +235,17 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
     private void setTestData() {
         //set test data
-        short[] testF1 = {2, 4, 3, 3, 2, 1, 4};
-        short[] testF2 = {3, 4, 2, 2, 3, 2, 3};
-        short[] testF3 = {4, 2, 3, 3, 3, 3, 2};
-        short[] temp1 = {22, 23};
+        float[] testF1 = {2.1f, 4.2f, 3.0f, 3.1f, 2.3f, 1.9f, 4.2f};
+        float[] testF2 = {3.8f, 4.1f, 2.4f, 2.5f, 3.1f, 2.2f, 3.8f};
+        float[] testF3 = {4.0f, 2.1f, 3.4f, 3.1f, 3.9f, 3.8f, 2.9f};
+        int[] temp1 = {22, 66};
         for (int i = 0; i < 10; i++) {
             mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF1, temp1));
             mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF2, temp1));
             mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF3, temp1));
 
-            short pressure = (short) (Math.random() * 1000);
-            short leakage = (short) (Math.random() * 1000);
+            float pressure = (short) (Math.random() * 8.3f);
+            float leakage = (short) (Math.random() * 10f);
             mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
             mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
             mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
@@ -271,15 +254,16 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         mChart2.setVoltageDataList(mVoltageDataList);
         mChart2.setPressureDataList(mPressureDataList);
 
-        mPressure = 1910;
+        mPressure = 4.15f;
         mTemperature1 = 21;
-        mTemperature2 = 154;
+        mTemperature2 = 85;
         float[] testVot = {2.8f, 4.1f, 3.0f, 3.8f, 3f, 3,4f};
-        int[] testP = {20, 33, 44, 32, 76, 43};
+        //int[] testP = {20, 33, 44, 32, 76, 43};
 
         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
             mBatteryVoltages[i] = testVot[i];
-            mBatteryPercents[i] = testP[i];
+            //mBatteryPercents[i] = testP[i];
+            mBatteryPercents[i] = DataConstants.getIntFromConfig(DataConstants.BatteryQuantityConfig, mBatteryVoltages[i]);
         }
     }
 
@@ -449,10 +433,11 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                 //数据帧之 电压
                 VoltageDataPack dataPackage = new VoltageDataPack(System.currentTimeMillis(), data);
                 mVoltageDataList.add(dataPackage);
-                mTemperature1 = dataPackage.tempList[0];
-                mTemperature2 = dataPackage.tempList[1];
+                mTemperature1 = dataPackage.tempListDisplay[0];
+                mTemperature2 = dataPackage.tempListDisplay[1];
                 for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
-                    mBatteryVoltages[i] = dataPackage.voltageList[i] / 10000f;
+                    mBatteryVoltages[i] = dataPackage.voltageListDisplay[i];
+                    mBatteryPercents[i] = DataConstants.getIntFromConfig(DataConstants.BatteryQuantityConfig, mBatteryVoltages[i]);
                 }
                 updateStatus();
                 //Toast.makeText(getApplicationContext(), dataPackage.toString(), Toast.LENGTH_SHORT).show();
@@ -462,8 +447,8 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                 //数据帧之 pressure
                 PressureDataPack dataPackage = new PressureDataPack(System.currentTimeMillis(), data);
                 mPressureDataList.add(dataPackage);
-                mPressure = dataPackage.pressure;
-                mLeakage = dataPackage.leakage;
+                mPressure = dataPackage.pressureDisplay;
+                mLeakage = dataPackage.leakageDisplay;
                 updateStatus();
                 //Toast.makeText(getApplicationContext(), dataPackage.toString(), Toast.LENGTH_SHORT).show();
             }
@@ -485,14 +470,14 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             DataPack dataPack = ((receivePackEvent) event).dataPack;
             if (dataPack instanceof VoltageDataPack) {
                 //todo
-                mTemperature1 = ((VoltageDataPack) dataPack).tempList[0];
-                mTemperature2 = ((VoltageDataPack) dataPack).tempList[1];
+                mTemperature1 = ((VoltageDataPack) dataPack).tempListDisplay[0];
+                mTemperature2 = ((VoltageDataPack) dataPack).tempListDisplay[1];
                 mVoltageDataList.add((VoltageDataPack) dataPack);
                 updateStatus();
             } else if (dataPack instanceof PressureDataPack) {
                 //todo
-                mPressure = ((PressureDataPack) dataPack).pressure;
-                mLeakage = ((PressureDataPack) dataPack).leakage;
+                mPressure = ((PressureDataPack) dataPack).pressureDisplay;
+                mLeakage = ((PressureDataPack) dataPack).leakageDisplay;
                 mPressureDataList.add((PressureDataPack) dataPack);
                 updateStatus();
             }
@@ -502,11 +487,12 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     @SuppressLint("NewApi")
     private void updateStatus() {
         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
-            mBatteryVoltageTvs[i].setText(mBatteryVoltages[i] + "V");
+            String vol = String.format("%.2f", mBatteryVoltages[i]);
+            mBatteryVoltageTvs[i].setText(vol + "V");
             mBatteryPercentTvs[i].setText(mBatteryPercents[i] + "%");
             mBatteryProgressBars[i].setProgress(mBatteryPercents[i]);
             if (!mChart1.isIsDrawLine()) {
-                mCellTvs[i].setText("Cell" + (i + 1) + ": " + mBatteryVoltages[i] + "V");
+                mCellTvs[i].setText("Cell" + (i + 1) + ": " + vol + "V");
             }
         }
 
@@ -516,13 +502,13 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             mTemp1Tv.setText("Temperature1:" + mTemperature1 + "°C");
             mTemp2Tv.setText("Temperature2:" + mTemperature2 + "°C");
         }
-        if (mTemperature1 > sTemperature1Threshold || mTemperature2 > sTemperature2Threshold) {
+        if (mTemperature1 > DataConstants.TEMP1_Threshold || mTemperature2 > DataConstants.TEMP2_Threshold) {
             mTemperatureWarning.setText("State:Warning");
         } else {
             mTemperatureWarning.setText("State:Normal");
         }
 
-        if (mLeakage > sLeakageThreshold) {
+        if (mLeakage > DataConstants.LEAKAGE_Threshold) {
             mLeakageStatus.setText("State:Warning");
             mLeakageColor.setBackgroundResource(R.drawable.yuanjiaobg_red);
         } else {
@@ -530,10 +516,10 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             mLeakageColor.setBackgroundResource(R.drawable.yuanjiaobg_green);
         }
 
-        mPressureProgressBar.setMaxProgress(mMaxPressure);
+        mPressureProgressBar.setMaxProgress(DataConstants.PRESSURE_MAX);
         mPressureProgressBar.setCurrentProgress(mPressure);
-        mPressureProgressBar.setCircleColor(mPressure > sPressureThreshold ? Color.parseColor("#CE0000") : Color.parseColor("#51C81C"));
-        mPressureStatusTv.setText(mPressure > sPressureThreshold ?  "State:Warning" : "State:Normal");
+        mPressureProgressBar.setCircleColor(mPressure > DataConstants.PRESSURE_Threshold ? Color.parseColor("#CE0000") : Color.parseColor("#51C81C"));
+        mPressureStatusTv.setText(mPressure > DataConstants.PRESSURE_Threshold ?  "State:Warning" : "State:Normal");
         if (!mChart2.isIsDrawLine()) {
             mPressure1Tv.setText("Pressure: " + mPressure + "Bar");
         }
