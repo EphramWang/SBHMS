@@ -11,8 +11,11 @@ import com.hoho.android.usbserial.examples.DataConstants;
 import com.hoho.android.usbserial.examples.R;
 import com.hoho.android.usbserial.model.PressureDataPack;
 import com.hoho.android.usbserial.model.VoltageDataPack;
+import com.hoho.android.usbserial.util.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import androidx.annotation.Nullable;
 
@@ -66,35 +69,68 @@ public class TempMonChart extends ChartBase {
         float x = mainRect.right;
         float y = (mainRect.top + mainRect.bottom) / 2f;
         float xDiff = mainRect.width() / (mCount - 1);
-        for (int i = voltageDataList.size() - 1; i >= 0; i--) {
-            VoltageDataPack voltageDataPack = voltageDataList.get(i);
-            for (int j = 0; j < TEMP_COUNT; j++) {
-                y = mainRect.top + mainRect.height() * (DataConstants.TEMP_MAX - voltageDataPack.tempListDisplay[j]) / (DataConstants.TEMP_MAX - DataConstants.TEMP_MIN);
-                if (pathList[j].isEmpty()) {
-                    pathList[j].moveTo(x, y);
-                } else {
-                    pathList[j].lineTo(x, y);
+        if (voltageDataList != null) {
+            for (int i = voltageDataList.size() - 1; i >= 0; i--) {
+                VoltageDataPack voltageDataPack = voltageDataList.get(i);
+                for (int j = 0; j < TEMP_COUNT; j++) {
+                    y = mainRect.top + mainRect.height() * (DataConstants.TEMP_MAX - voltageDataPack.tempListDisplay[j]) / (DataConstants.TEMP_MAX - DataConstants.TEMP_MIN);
+                    if (pathList[j].isEmpty()) {
+                        pathList[j].moveTo(x, y);
+                    } else {
+                        pathList[j].lineTo(x, y);
+                    }
                 }
+                x = x - xDiff;
             }
-            x = x - xDiff;
         }
 
-        x = mainRect.right;
-        for (int i = pressureDataList.size() - 1; i >=0; i--) {
-            PressureDataPack pressureDataPack = pressureDataList.get(i);
-            y = mainRect.top + mainRect.height() * (DataConstants.PRESSURE_MAX - pressureDataPack.pressureDisplay) / (DataConstants.PRESSURE_MAX - DataConstants.PRESSURE_MIN);
-            if (pathList[2].isEmpty()) {
-                pathList[2].moveTo(x, y);
-            } else {
-                pathList[2].lineTo(x, y);
+        if (pressureDataList != null) {
+            x = mainRect.right;
+            for (int i = pressureDataList.size() - 1; i >= 0; i--) {
+                PressureDataPack pressureDataPack = pressureDataList.get(i);
+                y = mainRect.top + mainRect.height() * (DataConstants.PRESSURE_MAX - pressureDataPack.pressureDisplay) / (DataConstants.PRESSURE_MAX - DataConstants.PRESSURE_MIN);
+                if (pathList[2].isEmpty()) {
+                    pathList[2].moveTo(x, y);
+                } else {
+                    pathList[2].lineTo(x, y);
+                }
+                x = x - xDiff;
             }
-            x = x - xDiff;
         }
 
         for (int j = 0; j < 3; j++) {
             paint.setColor(getResources().getColor(colorList[j]));
             paint.setStrokeWidth(2);
             canvas.drawPath(pathList[j], paint);
+        }
+
+        //draw legend
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(getResources().getColor(R.color.textColorDark));
+        paint.setAntiAlias(true);
+        paint.setTextSize(Utils.dp2px(getContext(), 12));
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText(DataConstants.TEMP_MAX + "°C", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(DataConstants.TEMP_MIN + "°C", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(DataConstants.PRESSURE_MAX + "Bar", mainRect.right, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        if (voltageDataList.size() > 0) {
+            try {
+                long lastTime = voltageDataList.get(voltageDataList.size() - 1).timestamp;
+                long firstTime;
+                if (voltageDataList.size() <= mCount) {
+                    firstTime = voltageDataList.get(0).timestamp;
+                } else {
+                    firstTime = voltageDataList.get(voltageDataList.size() - mCount).timestamp;
+                }
+                String strDateFormat = "yyyy-MM-dd HH:mm:ss";
+                SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                paint.setTextAlign(Paint.Align.RIGHT);
+                canvas.drawText(sdf.format(new Date(lastTime)), mainRect.right, mainRect.bottom - Utils.dp2px(getContext(), 0), paint);
+                paint.setTextAlign(Paint.Align.LEFT);
+                canvas.drawText(sdf.format(new Date(firstTime)), mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 0), paint);
+            } catch (Exception e) {
+            }
         }
 
         //draw touch line

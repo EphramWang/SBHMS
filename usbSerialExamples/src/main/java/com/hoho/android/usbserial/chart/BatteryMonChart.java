@@ -10,8 +10,11 @@ import android.util.AttributeSet;
 import com.hoho.android.usbserial.examples.DataConstants;
 import com.hoho.android.usbserial.examples.R;
 import com.hoho.android.usbserial.model.VoltageDataPack;
+import com.hoho.android.usbserial.util.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import androidx.annotation.Nullable;
 
@@ -67,6 +70,9 @@ public class BatteryMonChart extends ChartBase {
         float x = mainRect.right;
         float y = (mainRect.top + mainRect.bottom) / 2f;
         float xDiff = mainRect.width() / (mCount - 1);
+        if (voltageDataList == null) {
+            return;
+        }
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
             VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < BAT_COUNT; j++) {
@@ -85,6 +91,32 @@ public class BatteryMonChart extends ChartBase {
             paint.setColor(getResources().getColor(colorList[j]));
             paint.setStrokeWidth(2);
             canvas.drawPath(pathList[j], paint);
+        }
+
+        //draw legend
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(getResources().getColor(R.color.textColorDark));
+        paint.setAntiAlias(true);
+        paint.setTextSize(Utils.dp2px(getContext(), 12));
+        canvas.drawText(DataConstants.Battery_MaxVol + "V", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(DataConstants.Battery_MinVol + "V", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        if (voltageDataList.size() > 0) {
+            try {
+                long lastTime = voltageDataList.get(voltageDataList.size() - 1).timestamp;
+                long firstTime;
+                if (voltageDataList.size() <= mCount) {
+                    firstTime = voltageDataList.get(0).timestamp;
+                } else {
+                    firstTime = voltageDataList.get(voltageDataList.size() - mCount).timestamp;
+                }
+                String strDateFormat = "yyyy-MM-dd HH:mm:ss";
+                SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+                paint.setTextAlign(Paint.Align.RIGHT);
+                canvas.drawText(sdf.format(new Date(lastTime)), mainRect.right, mainRect.bottom - Utils.dp2px(getContext(), 0), paint);
+                paint.setTextAlign(Paint.Align.LEFT);
+                canvas.drawText(sdf.format(new Date(firstTime)), mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 0), paint);
+            } catch (Exception e) {
+            }
         }
 
         //draw touch line
