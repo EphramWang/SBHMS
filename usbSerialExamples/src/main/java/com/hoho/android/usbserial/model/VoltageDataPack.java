@@ -19,12 +19,12 @@ public class VoltageDataPack extends DataPack {
                 voltageList[i] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + i * 2);
             }
             //转换电压
-            voltageListDisplay[0] = 2.0f * voltageList[5] / 1000f;
-            voltageListDisplay[1] = 3.5f * voltageList[4] / 1000f - voltageListDisplay[0];
-            voltageListDisplay[2] = 4.3f * voltageList[3] / 1000f - voltageListDisplay[1];
-            voltageListDisplay[3] = 6.1f * voltageList[2] / 1000f - voltageListDisplay[2];
-            voltageListDisplay[4] = 8.5f * voltageList[1] / 1000f - voltageListDisplay[3];
-            voltageListDisplay[5] = 11.0f * voltageList[0] / 1000f - voltageListDisplay[4];
+            voltageListDisplay[0] = 2.0f * voltageList[5] / 10000f;
+            voltageListDisplay[1] = 3.5f * voltageList[4] / 10000f - voltageListDisplay[0];
+            voltageListDisplay[2] = 4.3f * voltageList[3] / 10000f - voltageListDisplay[1];
+            voltageListDisplay[3] = 6.1f * voltageList[2] / 10000f - voltageListDisplay[2];
+            voltageListDisplay[4] = 8.5f * voltageList[1] / 10000f - voltageListDisplay[3];
+            voltageListDisplay[5] = 11.0f * voltageList[0] / 10000f - voltageListDisplay[4];
             //转换温度
             tempList[0] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 12);
             tempList[1] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 14);
