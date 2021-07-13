@@ -20,11 +20,18 @@ public class VoltageDataPack extends DataPack {
             }
             //转换电压
             voltageListDisplay[0] = 2.0f * voltageList[5] / 10000f;
-            voltageListDisplay[1] = 3.5f * voltageList[4] / 10000f - voltageListDisplay[0];
-            voltageListDisplay[2] = 4.3f * voltageList[3] / 10000f - voltageListDisplay[1];
-            voltageListDisplay[3] = 6.1f * voltageList[2] / 10000f - voltageListDisplay[2];
-            voltageListDisplay[4] = 8.5f * voltageList[1] / 10000f - voltageListDisplay[3];
-            voltageListDisplay[5] = 11.0f * voltageList[0] / 10000f - voltageListDisplay[4];
+            voltageListDisplay[1] = 3.5f * voltageList[4] / 10000f - 2.0f * voltageList[5] / 10000f;
+            voltageListDisplay[2] = 4.3f * voltageList[3] / 10000f - 3.5f * voltageList[4] / 10000f;
+            voltageListDisplay[3] = 6.1f * voltageList[2] / 10000f - 4.3f * voltageList[3] / 10000f;
+            voltageListDisplay[4] = 8.5f * voltageList[1] / 10000f - 6.1f * voltageList[2] / 10000f;
+            voltageListDisplay[5] = 11.0f * voltageList[0] / 10000f - 8.5f * voltageList[1] / 10000f;
+            for (int i = 0; i < 6; i++) {
+                if (voltageListDisplay[i] > DataConstants.Battery_MaxVol) {
+                    voltageListDisplay[i] = DataConstants.Battery_MaxVol;
+                } else if (voltageListDisplay[i] < DataConstants.Battery_MinVol) {
+                    voltageListDisplay[i] = DataConstants.Battery_MinVol;
+                }
+            }
             //转换温度
             tempList[0] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 12);
             tempList[1] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + 14);
@@ -44,6 +51,8 @@ public class VoltageDataPack extends DataPack {
         return "VoltageDataPack{" +
                 "voltageList=" + Arrays.toString(voltageList) +
                 ", tempList=" + Arrays.toString(tempList) +
+                ", voltageListDisplay=" + Arrays.toString(voltageListDisplay) +
+                ", tempListDisplay=" + Arrays.toString(tempListDisplay) +
                 '}';
     }
 }
