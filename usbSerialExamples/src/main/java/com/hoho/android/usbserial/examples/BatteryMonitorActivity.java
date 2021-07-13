@@ -180,7 +180,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                     if (dataPack1 instanceof VoltageDataPack && ((VoltageDataPack) dataPack1).voltageListDisplay != null) {
                         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
                             float vol = ((VoltageDataPack) dataPack1).voltageListDisplay[i];
-                            String volStr = String.format("%.2f", vol);
+                            String volStr = String.format("%.4f", vol);
                             mCellTvs[i].setText("Cell" + (i + 1) + ": " + volStr + "V");
                         }
                     }
@@ -227,7 +227,11 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
         });
 
-        setTestData();
+        mChart1.setVoltageDataList(mVoltageDataList);
+        mChart2.setVoltageDataList(mVoltageDataList);
+        mChart2.setPressureDataList(mPressureDataList);
+
+        //setTestData();
 
         EventBus.getDefault().register(this);
 
@@ -489,7 +493,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
     @SuppressLint("NewApi")
     private void updateStatus() {
         for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
-            String vol = String.format("%.2f", mBatteryVoltages[i]);
+            String vol = String.format("%.4f", mBatteryVoltages[i]);
             mBatteryVoltageTvs[i].setText(vol + "V");
             mBatteryPercentTvs[i].setText(mBatteryPercents[i] + "%");
             mBatteryProgressBars[i].setProgress(mBatteryPercents[i]);
