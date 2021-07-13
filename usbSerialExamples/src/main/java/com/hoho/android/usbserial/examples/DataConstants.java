@@ -26,14 +26,14 @@ public class DataConstants {
 
     public static final float PRESSURE_MAX = 8.3f;
     public static final float PRESSURE_MIN = 0f;
-    public static final float PRESSURE_Threshold = 6.0f;
+    public static final float PRESSURE_Threshold = 8.3f;
     public static final float LEAKAGE_Threshold = 1.7f;
 
     public static final int TEMP_MAX = 85;
     public static final int TEMP_MIN = -40;
 
-    public static final int TEMP1_Threshold = 70;//todo
-    public static final int TEMP2_Threshold = 70;//todo
+    public static final int TEMP1_Threshold = 85;
+    public static final int TEMP2_Threshold = 85;
 
     public static final float Battery_MaxVol = 4.20f;
     public static final float Battery_MinVol = 2.75f;
