@@ -67,7 +67,8 @@ public class DataConstants {
             BufferedReader bufReader = new BufferedReader(inputReader);
             String line;
             while((line = bufReader.readLine()) != null) {
-                if (line.trim().startsWith(";")) {
+                String trimedLine = line.trim();
+                if (trimedLine.startsWith(";") || trimedLine.startsWith("[")) {
                     continue;//skip comments
                 }
                 String[] lineData = line.trim().split(":");
@@ -109,7 +110,18 @@ public class DataConstants {
             }
         }
         if (!valueFound && configs.size() > 0) {
-            value = configs.get(0).valueInt;
+            if (configs.get(0).key > configs.get(configs.size() - 1).key) {
+                if (key > configs.get(0).key) {
+                    value = configs.get(0).valueInt;
+                } else if (key < configs.get(configs.size() - 1).key)
+                    value = configs.get(configs.size() - 1).valueInt;
+            } else if (configs.get(0).key < configs.get(configs.size() - 1).key) {
+                if (key < configs.get(0).key) {
+                    value = configs.get(0).valueInt;
+                } else if (key > configs.get(configs.size() - 1).key) {
+                    value = configs.get(configs.size() - 1).valueInt;
+                }
+            }
         }
         return value;
     }
@@ -129,7 +141,18 @@ public class DataConstants {
             }
         }
         if (!valueFound && configs.size() > 0) {
-            value = configs.get(0).valueFloat;
+            if (configs.get(0).key > configs.get(configs.size() - 1).key) {
+                if (key > configs.get(0).key) {
+                    value = configs.get(0).valueFloat;
+                } else if (key < configs.get(configs.size() - 1).key)
+                    value = configs.get(configs.size() - 1).valueFloat;
+            } else if (configs.get(0).key < configs.get(configs.size() - 1).key) {
+                if (key < configs.get(0).key) {
+                    value = configs.get(0).valueFloat;
+                } else if (key > configs.get(configs.size() - 1).key) {
+                    value = configs.get(configs.size() - 1).valueFloat;
+                }
+            }
         }
         return value;
     }
