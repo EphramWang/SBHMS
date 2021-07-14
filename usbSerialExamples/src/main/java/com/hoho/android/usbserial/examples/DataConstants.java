@@ -5,6 +5,9 @@ import android.content.Context;
 import com.hoho.android.usbserial.model.Config;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -24,16 +27,27 @@ public class DataConstants {
 
     public static final int BATTERY_COUNT = 6;
 
-    public static final float PRESSURE_MAX = 8.3f;
-    public static final float PRESSURE_MIN = 0f;
-    public static final float PRESSURE_Threshold = 8.3f;
-    public static final float LEAKAGE_Threshold = 1.7f;
+    public static float PRESSURE_MAX = 8.3f;
+    public static float PRESSURE_MIN = 0f;
+    public static float PRESSURE_Threshold = 8.3f;
+    public static float LEAKAGE_Threshold = 1.7f;
 
-    public static final int TEMP_MAX = 85;
-    public static final int TEMP_MIN = -40;
+    public static int TEMP_MAX = 85;
+    public static int TEMP_MIN = -40;
+    public static int TEMP1_MAX = 85;
+    public static int TEMP1_MIN = -40;
+    public static int TEMP2_MAX = 85;
+    public static int TEMP2_MIN = -40;
 
-    public static final int TEMP1_Threshold = 85;
-    public static final int TEMP2_Threshold = 85;
+    public static int TEMP1_Threshold = 85;
+    public static int TEMP2_Threshold = 85;
+
+    public static float BAT1proportion = 2f;
+    public static float BAT2proportion = 3.5f;
+    public static float BAT3proportion = 4.3f;
+    public static float BAT4proportion = 6.1f;
+    public static float BAT5proportion = 8.5f;
+    public static float BAT6proportion = 11f;
 
     public static final float Battery_MaxVol = 4.20f;
     public static final float Battery_MinVol = 2.75f;
@@ -54,16 +68,200 @@ public class DataConstants {
     }
 
     public static void initConfig(Context context) {
-        CapacitancePressureConfig = getFromAssets(context, "Capacitance_Pressure_Conversion.txt", 1);
-        BatteryQuantityConfig = getFromAssets(context, "Battery_Quantity_Calculation.txt", 0);
-        Temperature1Config = getFromAssets(context, "Temperature1_Calculation.txt", 0);
-        Temperature2Config = getFromAssets(context, "Temperature2_Calculation.txt", 0);
+        boolean readThreshHold = false;
+        File file = new File("/sdcard/serialConfig/Threshold_of_Sensor.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            readThreshHold = readThreshhold(fileInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!readThreshHold) {
+            try {
+                readThreshhold(context.getResources().getAssets().open("Threshold_of_Sensor.txt"));
+            } catch (Exception e) {
+            }
+        }
+        TEMP_MIN = Math.min(TEMP1_MIN, TEMP2_MIN);
+        TEMP_MAX = Math.max(TEMP1_MAX, TEMP2_MAX);
+
+        boolean readBat = false;
+        File fileBat = new File("/sdcard/serialConfig/Battery_Voltage_Calculation.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileBat);
+            readBat = readBATproportion(fileInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!readBat) {
+            try {
+                readBATproportion(context.getResources().getAssets().open("Battery_Voltage_Calculation.txt"));
+            } catch (Exception e) {
+            }
+        }
+
+        File fileCapacitance = new File("/sdcard/serialConfig/Capacitance_Pressure_Conversion.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileCapacitance);
+            CapacitancePressureConfig = getFromStream(context, fileInputStream, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (CapacitancePressureConfig == null || CapacitancePressureConfig.size() == 0) {
+            CapacitancePressureConfig = getFromAssets(context, "Capacitance_Pressure_Conversion.txt", 1);
+        }
+
+        File fileBattery = new File("/sdcard/serialConfig/Battery_Quantity_Calculation.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileBattery);
+            BatteryQuantityConfig = getFromStream(context, fileInputStream, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (BatteryQuantityConfig == null || BatteryQuantityConfig.size() == 0) {
+            BatteryQuantityConfig = getFromAssets(context, "Battery_Quantity_Calculation.txt", 0);
+        }
+
+        File fileTemperature1 = new File("/sdcard/serialConfig/Temperature1_Calculation.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileTemperature1);
+            Temperature1Config = getFromStream(context, fileInputStream, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (Temperature1Config == null || Temperature1Config.size() == 0) {
+            Temperature1Config = getFromAssets(context, "Temperature1_Calculation.txt", 0);
+        }
+        File fileTemperature2 = new File("/sdcard/serialConfig/Temperature2_Calculation.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileTemperature2);
+            Temperature2Config = getFromStream(context, fileInputStream, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (Temperature2Config == null || Temperature1Config.size() == 0) {
+            Temperature2Config = getFromAssets(context, "Temperature2_Calculation.txt", 0);
+        }
     }
 
-    public static ArrayList<Config> getFromAssets(Context context, String fileName, int dataType){
+    public static boolean readBATproportion(InputStream inputStream) {
+        try {
+            InputStreamReader inputReader = new InputStreamReader(inputStream);
+            BufferedReader bufReader = new BufferedReader(inputReader);
+            String line;
+            while((line = bufReader.readLine()) != null) {
+                String trimedLine = line.trim();
+                if (trimedLine.startsWith(";") || trimedLine.startsWith("[")) {
+                    continue;//skip comments
+                }
+                if (trimedLine.startsWith("BAT1.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT1proportion = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("BAT2.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT2proportion = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("BAT3.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT3proportion = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("BAT4.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT4proportion = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("BAT5.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT5proportion = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("BAT6.proportion")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        BAT6proportion = Float.parseFloat(datas[1].trim());
+                    }
+                }
+            }
+            bufReader.close();
+            inputReader.close();
+            return true;
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+    public static boolean readThreshhold(InputStream inputStream) {
+        try {
+            InputStreamReader inputReader = new InputStreamReader(inputStream);
+            BufferedReader bufReader = new BufferedReader(inputReader);
+            String line;
+            while((line = bufReader.readLine()) != null) {
+                String trimedLine = line.trim();
+                if (trimedLine.startsWith(";") || trimedLine.startsWith("[")) {
+                    continue;//skip comments
+                }
+                if (trimedLine.startsWith("Threshold.Pressure")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        float data1 = Float.parseFloat(datas[1].trim());
+                        PRESSURE_MAX = data1;
+                        PRESSURE_Threshold = data1;
+                    }
+                } else if (trimedLine.startsWith("Threshold.Leakage")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        LEAKAGE_Threshold = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Threshold.Temperature1.min")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP1_MIN = Integer.parseInt(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Threshold.Temperature2.min")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP2_MIN = Integer.parseInt(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Threshold.Temperature1.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP1_MAX = Integer.parseInt(datas[1].trim());
+                        TEMP1_Threshold = TEMP1_MAX;
+                    }
+                } else if (trimedLine.startsWith("Threshold.Temperature2.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP2_MAX = Integer.parseInt(datas[1].trim());
+                        TEMP2_Threshold = TEMP2_MAX;
+                    }
+                }
+            }
+            bufReader.close();
+            inputReader.close();
+            return true;
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+    public static ArrayList<Config> getFromAssets(Context context, String fileName, int dataType) {
+        try {
+            return getFromStream(context, context.getResources().getAssets().open(fileName), dataType);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public static ArrayList<Config> getFromStream(Context context, InputStream inputStream, int dataType){
         ArrayList<Config> configMaps = new ArrayList<>();
         try {
-            InputStreamReader inputReader = new InputStreamReader(context.getResources().getAssets().open(fileName) );
+            InputStreamReader inputReader = new InputStreamReader(inputStream);
             BufferedReader bufReader = new BufferedReader(inputReader);
             String line;
             while((line = bufReader.readLine()) != null) {
@@ -88,6 +286,8 @@ public class DataConstants {
                     }
                 }
             }
+            bufReader.close();
+            inputReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

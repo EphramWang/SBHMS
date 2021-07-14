@@ -19,12 +19,12 @@ public class VoltageDataPack extends DataPack {
                 voltageList[i] = Utils.byteArrayToShort(dataBytes, DATA_START + 4 + i * 2);
             }
             //转换电压
-            voltageListDisplay[0] = 2.0f * voltageList[5] / 10000f;
-            voltageListDisplay[1] = 3.5f * voltageList[4] / 10000f - 2.0f * voltageList[5] / 10000f;
-            voltageListDisplay[2] = 4.3f * voltageList[3] / 10000f - 3.5f * voltageList[4] / 10000f;
-            voltageListDisplay[3] = 6.1f * voltageList[2] / 10000f - 4.3f * voltageList[3] / 10000f;
-            voltageListDisplay[4] = 8.5f * voltageList[1] / 10000f - 6.1f * voltageList[2] / 10000f;
-            voltageListDisplay[5] = 11.0f * voltageList[0] / 10000f - 8.5f * voltageList[1] / 10000f;
+            voltageListDisplay[0] = DataConstants.BAT1proportion * voltageList[5] / 10000f;
+            voltageListDisplay[1] = DataConstants.BAT2proportion * voltageList[4] / 10000f - DataConstants.BAT1proportion * voltageList[5] / 10000f;
+            voltageListDisplay[2] = DataConstants.BAT3proportion * voltageList[3] / 10000f - DataConstants.BAT2proportion * voltageList[4] / 10000f;
+            voltageListDisplay[3] = DataConstants.BAT4proportion * voltageList[2] / 10000f - DataConstants.BAT3proportion * voltageList[3] / 10000f;
+            voltageListDisplay[4] = DataConstants.BAT5proportion * voltageList[1] / 10000f - DataConstants.BAT4proportion * voltageList[2] / 10000f;
+            voltageListDisplay[5] = DataConstants.BAT6proportion * voltageList[0] / 10000f - DataConstants.BAT5proportion * voltageList[1] / 10000f;
             for (int i = 0; i < 6; i++) {
                 if (voltageListDisplay[i] > DataConstants.Battery_MaxVol) {
                     voltageListDisplay[i] = DataConstants.Battery_MaxVol;
