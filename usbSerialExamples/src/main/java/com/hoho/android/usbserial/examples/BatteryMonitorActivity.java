@@ -246,6 +246,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         mChart2.setPressureDataList(mPressureDataList);
 
         //setTestData();
+        //startTestThread();
 
         EventBus.getDefault().register(this);
 
@@ -258,10 +259,14 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         float[] testF1 = {2.1f, 4.2f, 3.0f, 3.1f, 2.3f, 1.9f, 4.2f};
         float[] testF2 = {3.8f, 4.1f, 2.4f, 2.5f, 3.1f, 2.2f, 3.8f};
         float[] testF3 = {4.0f, 2.1f, 3.4f, 3.1f, 3.9f, 3.8f, 2.9f};
-        int[] temp1 = {22, 66};
+
         for (int i = 0; i < 10; i++) {
+            int[] temp1 = {22, 66};
+            temp1[0] = (int) (Math.random() * 50);
+            int[] temp2 = {22, 66};
+            temp1[0] = (int) (Math.random() * 60);
             mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF1, temp1));
-            mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF2, temp1));
+            mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF2, temp2));
             mVoltageDataList.add(new VoltageDataPack(0, new byte[1], testF3, temp1));
 
             float pressure = (short) (Math.random() * 8.3f);
@@ -286,6 +291,51 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             //mBatteryPercents[i] = testP[i];
             mBatteryPercents[i] = DataConstants.getIntFromConfig(DataConstants.BatteryQuantityConfig, mBatteryVoltages[i]);
         }
+    }
+
+    void startTestThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    mainLooper.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (Math.random() > 0.5f) {
+                                //数据帧之 pressure
+                                float pressure = (short) (Math.random() * 8.3f);
+                                float leakage = (short) (Math.random() * 10f);
+                                PressureDataPack dataPackage = new PressureDataPack(System.currentTimeMillis(), new byte[1], pressure, leakage);
+                                mPressureDataList.add(dataPackage);
+                                mPressure = dataPackage.pressureDisplay;
+                                mLeakage = dataPackage.leakageDisplay;
+                                updateStatus();
+                            } else {
+                                //数据帧之 电压
+                                int[] temp1 = {22, 66};
+                                temp1[0] = (int) (Math.random() * 50);
+                                temp1[1] = (int) (Math.random() * 30);
+                                float[] testF1 = {2.1f, 4.2f, 3.0f, 3.1f, 2.3f, 1.9f, 4.2f};
+                                VoltageDataPack dataPackage = new VoltageDataPack(System.currentTimeMillis(), new byte[1], testF1, temp1);
+                                mVoltageDataList.add(dataPackage);
+                                mTemperature1 = dataPackage.tempListDisplay[0];
+                                mTemperature2 = dataPackage.tempListDisplay[1];
+                                for (int i = 0; i < DataConstants.BATTERY_COUNT; i++) {
+                                    mBatteryVoltages[i] = dataPackage.voltageListDisplay[i];
+                                    mBatteryPercents[i] = DataConstants.getIntFromConfig(DataConstants.BatteryQuantityConfig, mBatteryVoltages[i]);
+                                }
+                                updateStatus();
+                            }
+                        }
+                    });
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -548,8 +598,10 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             mPressure1Tv.setText("Pressure: " + mPressure + "Bar");
         }
 
-        mChart1.invalidate();
-        mChart2.invalidate();
+        if (!mChart1.isIsDrawLine())
+            mChart1.invalidate();
+        if (!mChart2.isIsDrawLine())
+            mChart2.invalidate();
     }
 
     public static class receivePackEvent {
