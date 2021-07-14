@@ -8,11 +8,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.hoho.android.usbserial.examples.DataConstants;
+
 import androidx.annotation.Nullable;
 
 public class ChartBase extends View implements ITouchable {
 
-    public int mCount = 30;//最多显示30个数据
+    public int mCount = DataConstants.DATA_COUNT_30S;
 
     protected RectF mainRect;
     protected ChartTouchHandler mChartTouchHandler;

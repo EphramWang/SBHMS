@@ -18,9 +18,9 @@ public class DataConstants {
     public static final int DATA_LENGTH_VOLTAGE = 26;
     public static final int DATA_LENGTH_PRESSURE = 14;
 
-    public static final int DATA_COUNT_30S = 30;
-    public static final int DATA_COUNT_3MIN = 180;
-    public static final int DATA_COUNT_10MIN = 600;
+    public static final int DATA_COUNT_30S = 240;
+    public static final int DATA_COUNT_3MIN = 1440;
+    public static final int DATA_COUNT_10MIN = 4800;
 
     public static final int BATTERY_COUNT = 6;
 

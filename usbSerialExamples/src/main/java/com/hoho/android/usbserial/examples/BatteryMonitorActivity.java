@@ -101,6 +101,11 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
     TextView mTimeTv1, mTimeTv2, mTimeTv3;
 
+    private void clear() {
+        mVoltageDataList.clear();
+        mPressureDataList.clear();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,10 +121,13 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             }
         };
         mainLooper = new Handler(Looper.getMainLooper());
-        deviceId = getIntent().getExtras().getInt("device");
-        portNum = getIntent().getExtras().getInt("port");
-        baudRate = getIntent().getExtras().getInt("baud");
-        withIoManager = getIntent().getExtras().getBoolean("withIoManager");
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            deviceId = getIntent().getExtras().getInt("device");
+            portNum = getIntent().getExtras().getInt("port");
+            baudRate = getIntent().getExtras().getInt("baud");
+            withIoManager = getIntent().getExtras().getBoolean("withIoManager");
+        }
         if (deviceId == 0 && portNum == 0 && baudRate ==0) {
             deviceId = 1002;
             portNum = 0;
@@ -205,21 +213,27 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
         mTimeTv3 = findViewById(R.id.time3);
         mTimeTv1.setBackgroundColor(getResources().getColor(R.color.bgDark));
         mTimeTv1.setOnClickListener(view -> {
+            mChart1.mCount = DataConstants.DATA_COUNT_30S;
             mChart2.mCount = DataConstants.DATA_COUNT_30S;
+            mChart1.postInvalidate();
             mChart2.postInvalidate();
             mTimeTv1.setBackgroundColor(getResources().getColor(R.color.bgDark));
             mTimeTv2.setBackgroundColor(getResources().getColor(R.color.bgLight));
             mTimeTv3.setBackgroundColor(getResources().getColor(R.color.bgLight));
         });
         mTimeTv2.setOnClickListener(view -> {
+            mChart1.mCount = DataConstants.DATA_COUNT_3MIN;
             mChart2.mCount = DataConstants.DATA_COUNT_3MIN;
+            mChart1.postInvalidate();
             mChart2.postInvalidate();
             mTimeTv1.setBackgroundColor(getResources().getColor(R.color.bgLight));
             mTimeTv2.setBackgroundColor(getResources().getColor(R.color.bgDark));
             mTimeTv3.setBackgroundColor(getResources().getColor(R.color.bgLight));
         });
         mTimeTv3.setOnClickListener(view -> {
+            mChart1.mCount = DataConstants.DATA_COUNT_10MIN;
             mChart2.mCount = DataConstants.DATA_COUNT_10MIN;
+            mChart1.postInvalidate();
             mChart2.postInvalidate();
             mTimeTv1.setBackgroundColor(getResources().getColor(R.color.bgLight));
             mTimeTv2.setBackgroundColor(getResources().getColor(R.color.bgLight));
@@ -254,13 +268,14 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             float leakage = (short) (Math.random() * 10f);
             mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
             mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
-            mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, leakage));
+            mPressureDataList.add(new PressureDataPack(0, new byte[1], pressure, 8.3f));
         }
         mChart1.setVoltageDataList(mVoltageDataList);
         mChart2.setVoltageDataList(mVoltageDataList);
         mChart2.setPressureDataList(mPressureDataList);
 
-        mPressure = 4.15f;
+        mPressure = 8.3f;
+        mLeakage = 1.7f;
         mTemperature1 = 21;
         mTemperature2 = 85;
         float[] testVot = {2.8f, 4.1f, 3.0f, 3.8f, 3f, 3,4f};
@@ -320,6 +335,9 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
      * Serial + UI
      */
     private void connect() {
+        //重新链接要清除数据
+        clear();
+
         UsbDevice device = null;
         UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         for(UsbDevice v : usbManager.getDeviceList().values())
@@ -508,13 +526,13 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
             mTemp1Tv.setText("Temperature1:" + mTemperature1 + "°C");
             mTemp2Tv.setText("Temperature2:" + mTemperature2 + "°C");
         }
-        if (mTemperature1 > DataConstants.TEMP1_Threshold || mTemperature2 > DataConstants.TEMP2_Threshold) {
+        if (mTemperature1 >= DataConstants.TEMP1_Threshold || mTemperature2 >= DataConstants.TEMP2_Threshold) {
             mTemperatureWarning.setText("State:Warning");
         } else {
             mTemperatureWarning.setText("State:Normal");
         }
 
-        if (mLeakage > DataConstants.LEAKAGE_Threshold) {
+        if (mLeakage >= DataConstants.LEAKAGE_Threshold) {
             mLeakageStatus.setText("State:Warning");
             mLeakageColor.setBackgroundResource(R.drawable.yuanjiaobg_red);
         } else {
@@ -524,8 +542,8 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
 
         mPressureProgressBar.setMaxProgress(DataConstants.PRESSURE_MAX);
         mPressureProgressBar.setCurrentProgress(mPressure);
-        mPressureProgressBar.setCircleColor(mPressure > DataConstants.PRESSURE_Threshold ? Color.parseColor("#CE0000") : Color.parseColor("#51C81C"));
-        mPressureStatusTv.setText(mPressure > DataConstants.PRESSURE_Threshold ?  "State:Warning" : "State:Normal");
+        mPressureProgressBar.setCircleColor(mPressure >= DataConstants.PRESSURE_Threshold ? Color.parseColor("#CE0000") : Color.parseColor("#51C81C"));
+        mPressureStatusTv.setText(mPressure >= DataConstants.PRESSURE_Threshold ?  "State:Warning" : "State:Normal");
         if (!mChart2.isIsDrawLine()) {
             mPressure1Tv.setText("Pressure: " + mPressure + "Bar");
         }
