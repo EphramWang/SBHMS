@@ -30,7 +30,7 @@ public class CirCleProgressBar extends View {
     private float currentAngle;//当前角度
     private float lastAngle;
     private ValueAnimator progressAnimator;//圆弧动画
-    private int duration = 1000;//动画时长
+    private int duration = 200;//动画时长
     private  boolean isDefaultText;//是否设置文字显示的值
     private  String mTextValue;//字体显示的值
 
