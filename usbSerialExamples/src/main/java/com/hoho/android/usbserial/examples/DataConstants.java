@@ -52,7 +52,7 @@ public class DataConstants {
     public static float BAT6proportion = 11f;
 
     public static float Battery_MaxVol = 4.20f;
-    public static float Battery_MinVol = 2.75f;
+    public static float Battery_MinVol = 2.70f;
 
     public static ArrayList<Config> CapacitancePressureConfig = new ArrayList<>();
     public static ArrayList<Config> BatteryQuantityConfig = new ArrayList<>();
@@ -225,8 +225,7 @@ public class DataConstants {
                 if (trimedLine.startsWith("Threshold.Pressure")) {
                     String[] datas = trimedLine.split("=");
                     if (datas.length == 2) {
-                        float data1 = Float.parseFloat(datas[1].trim());
-                        PRESSURE_Threshold = data1;
+                        PRESSURE_Threshold = Float.parseFloat(datas[1].trim());
                     }
                 } else if (trimedLine.startsWith("Threshold.Leakage")) {
                     String[] datas = trimedLine.split("=");
