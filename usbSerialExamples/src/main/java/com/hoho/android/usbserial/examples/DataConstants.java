@@ -29,7 +29,9 @@ public class DataConstants {
 
     public static float PRESSURE_MAX = 8.3f;
     public static float PRESSURE_MIN = 0f;
-    public static float PRESSURE_Threshold = 8.3f;
+    public static float PRESSURE_Threshold = 6f;
+    public static float LEAKAGE_MAX= 3.3f;
+    public static float LEAKAGE_MIN = 0f;
     public static float LEAKAGE_Threshold = 1.7f;
 
     public static int TEMP_MAX = 85;
@@ -39,8 +41,8 @@ public class DataConstants {
     public static int TEMP2_MAX = 85;
     public static int TEMP2_MIN = -40;
 
-    public static int TEMP1_Threshold = 85;
-    public static int TEMP2_Threshold = 85;
+    public static int TEMP1_Threshold = 65;
+    public static int TEMP2_Threshold = 65;
 
     public static float BAT1proportion = 2f;
     public static float BAT2proportion = 3.5f;
@@ -49,8 +51,8 @@ public class DataConstants {
     public static float BAT5proportion = 8.5f;
     public static float BAT6proportion = 11f;
 
-    public static final float Battery_MaxVol = 4.20f;
-    public static final float Battery_MinVol = 2.75f;
+    public static float Battery_MaxVol = 4.20f;
+    public static float Battery_MinVol = 2.75f;
 
     public static ArrayList<Config> CapacitancePressureConfig = new ArrayList<>();
     public static ArrayList<Config> BatteryQuantityConfig = new ArrayList<>();
@@ -68,6 +70,21 @@ public class DataConstants {
     }
 
     public static void initConfig(Context context) {
+        boolean readLimits = false;
+        File fileLimits = new File("/sdcard/serialConfig/Limits_of_Sensor.txt");
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileLimits);
+            readLimits = readThreshhold(fileInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!readLimits) {
+            try {
+                readThreshhold(context.getResources().getAssets().open("Limits_of_Sensor.txt"));
+            } catch (Exception e) {
+            }
+        }
+
         boolean readThreshHold = false;
         File file = new File("/sdcard/serialConfig/Threshold_of_Sensor.txt");
         try {
@@ -209,7 +226,6 @@ public class DataConstants {
                     String[] datas = trimedLine.split("=");
                     if (datas.length == 2) {
                         float data1 = Float.parseFloat(datas[1].trim());
-                        PRESSURE_MAX = data1;
                         PRESSURE_Threshold = data1;
                     }
                 } else if (trimedLine.startsWith("Threshold.Leakage")) {
@@ -217,27 +233,65 @@ public class DataConstants {
                     if (datas.length == 2) {
                         LEAKAGE_Threshold = Float.parseFloat(datas[1].trim());
                     }
-                } else if (trimedLine.startsWith("Threshold.Temperature1.min")) {
+                } else if (trimedLine.startsWith("Threshold.Temperature1")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP1_Threshold = Integer.parseInt(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Threshold.Temperature2")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP2_Threshold = Integer.parseInt(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Voltage.min")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        Battery_MinVol = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Voltage.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        Battery_MaxVol = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Temperature1.min")) {
                     String[] datas = trimedLine.split("=");
                     if (datas.length == 2) {
                         TEMP1_MIN = Integer.parseInt(datas[1].trim());
                     }
-                } else if (trimedLine.startsWith("Threshold.Temperature2.min")) {
+                } else if (trimedLine.startsWith("Limit.Temperature1.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        TEMP1_MAX = Integer.parseInt(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Temperature2.min")) {
                     String[] datas = trimedLine.split("=");
                     if (datas.length == 2) {
                         TEMP2_MIN = Integer.parseInt(datas[1].trim());
                     }
-                } else if (trimedLine.startsWith("Threshold.Temperature1.max")) {
-                    String[] datas = trimedLine.split("=");
-                    if (datas.length == 2) {
-                        TEMP1_MAX = Integer.parseInt(datas[1].trim());
-                        TEMP1_Threshold = TEMP1_MAX;
-                    }
-                } else if (trimedLine.startsWith("Threshold.Temperature2.max")) {
+                } else if (trimedLine.startsWith("Limit.Temperature2.max")) {
                     String[] datas = trimedLine.split("=");
                     if (datas.length == 2) {
                         TEMP2_MAX = Integer.parseInt(datas[1].trim());
-                        TEMP2_Threshold = TEMP2_MAX;
+                    }
+                } else if (trimedLine.startsWith("Limit.Pressure.min")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        PRESSURE_MIN = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Pressure.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        PRESSURE_MAX = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Leakage.min")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        LEAKAGE_MIN = Float.parseFloat(datas[1].trim());
+                    }
+                } else if (trimedLine.startsWith("Limit.Leakage.max")) {
+                    String[] datas = trimedLine.split("=");
+                    if (datas.length == 2) {
+                        LEAKAGE_MAX = Float.parseFloat(datas[1].trim());
                     }
                 }
             }

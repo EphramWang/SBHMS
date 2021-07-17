@@ -1,0 +1,12 @@
+;上下限对应
+[Limit]
+Limit.Voltage.min = 2.7
+Limit.Voltage.max = 4.2
+Limit.Temperature1.min = -40
+Limit.Temperature1.max = 85
+Limit.Temperature2.min = -40
+Limit.Temperature2.max = 85
+Limit.Pressure.min = 0
+Limit.Pressure.max = 8.3
+Limit.Leakage.min = 0
+Limit.Leakage.max = 3.3

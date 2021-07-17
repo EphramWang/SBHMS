@@ -14,7 +14,7 @@
 
         <ImageView
             android:id="@+id/logo2"
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:src="@mipmap/logo2"
             android:scaleType="fitXY"
@@ -23,9 +23,10 @@
 
         <ImageView
             android:id="@+id/logo1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
             android:src="@mipmap/logo1"
+            android:scaleType="fitCenter"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="10dp"/>
 

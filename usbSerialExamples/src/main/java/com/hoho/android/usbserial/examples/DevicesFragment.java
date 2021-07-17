@@ -2,7 +2,6 @@ package com.hoho.android.usbserial.examples;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 
 public class DevicesFragment extends ListFragment {
@@ -155,13 +155,13 @@ public class DevicesFragment extends ListFragment {
             args.putInt("port", item.port);
             args.putInt("baud", baudRate);
             args.putBoolean("withIoManager", withIoManager);
-//            Fragment fragment = new TerminalFragment();
-//            fragment.setArguments(args);
-//            getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
+            Fragment fragment = new TerminalFragment();
+            fragment.setArguments(args);
+            getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
 
-            Intent intent = new Intent(getContext(), BatteryMonitorActivity.class);
-            intent.putExtras(args);
-            startActivity(intent);
+//            Intent intent = new Intent(getContext(), BatteryMonitorActivity.class);
+//            intent.putExtras(args);
+//            startActivity(intent);
         }
     }
 
