@@ -168,22 +168,37 @@ public class TempMonChart extends ChartBase {
     @Override
     public void onLongPressMove(float x, float y) {
         super.onLongPressMove(x, y);
+        VoltageDataPack voltageDataPack = null;
+        PressureDataPack pressureDataPack = null;
         try {
             int index = voltageDataList.size() - mCount + getIndexByX(x);
-            int index2 = pressureDataList.size() - mCount + getIndexByX(x);
-            mTouchCallBack.onTouch(voltageDataList.get(index), pressureDataList.get(index2));
+            voltageDataPack = voltageDataList.get(index);
         } catch (Exception e) {
         }
+        try {
+            int index2 = pressureDataList.size() - mCount + getIndexByX(x);
+            pressureDataPack = pressureDataList.get(index2);
+        } catch (Exception e) {
+        }
+        mTouchCallBack.onTouch(voltageDataPack, pressureDataPack);
     }
 
     @Override
     public void onLongPressDown(float x, float y) {
         super.onLongPressDown(x, y);
+        VoltageDataPack voltageDataPack = null;
+        PressureDataPack pressureDataPack = null;
         try {
             int index = voltageDataList.size() - mCount + getIndexByX(x);
-            int index2 = pressureDataList.size() - mCount + getIndexByX(x);
-            mTouchCallBack.onTouch(voltageDataList.get(index), pressureDataList.get(index2));
+            voltageDataPack = voltageDataList.get(index);
         } catch (Exception e) {
         }
+        try {
+            int index2 = pressureDataList.size() - mCount + getIndexByX(x);
+            pressureDataPack = pressureDataList.get(index2);
+        } catch (Exception e) {
+
+        }
+        mTouchCallBack.onTouch(voltageDataPack, pressureDataPack);
     }
 }

@@ -114,7 +114,7 @@ public class DataConstants {
         File fileBattery = new File("/sdcard/serialConfig/Battery_Quantity_Calculation.txt");
         try {
             FileInputStream fileInputStream = new FileInputStream(fileBattery);
-            BatteryQuantityConfig = getFromStream(context, fileInputStream, 1);
+            BatteryQuantityConfig = getFromStream(context, fileInputStream, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,7 +125,7 @@ public class DataConstants {
         File fileTemperature1 = new File("/sdcard/serialConfig/Temperature1_Calculation.txt");
         try {
             FileInputStream fileInputStream = new FileInputStream(fileTemperature1);
-            Temperature1Config = getFromStream(context, fileInputStream, 1);
+            Temperature1Config = getFromStream(context, fileInputStream, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,7 +135,7 @@ public class DataConstants {
         File fileTemperature2 = new File("/sdcard/serialConfig/Temperature2_Calculation.txt");
         try {
             FileInputStream fileInputStream = new FileInputStream(fileTemperature2);
-            Temperature2Config = getFromStream(context, fileInputStream, 1);
+            Temperature2Config = getFromStream(context, fileInputStream, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }
