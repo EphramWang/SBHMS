@@ -81,6 +81,9 @@ public class TempMonChart extends ChartBase {
                     }
                 }
                 x = x - xDiff;
+                if (x < mainRect.left) {
+                    break;
+                }
             }
         }
 
@@ -95,6 +98,9 @@ public class TempMonChart extends ChartBase {
                     pathList[2].lineTo(x, y);
                 }
                 x = x - xDiff;
+                if (x < mainRect.left) {
+                    break;
+                }
             }
         }
 

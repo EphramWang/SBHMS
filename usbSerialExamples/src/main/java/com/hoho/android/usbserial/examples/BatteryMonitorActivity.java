@@ -329,7 +329,7 @@ public class BatteryMonitorActivity extends AppCompatActivity implements SerialI
                         }
                     });
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

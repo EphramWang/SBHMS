@@ -84,7 +84,9 @@ public class BatteryMonChart extends ChartBase {
                 }
             }
             x = x - xDiff;
-
+            if (x < mainRect.left) {
+                break;
+            }
         }
 
         for (int j = 0; j < BAT_COUNT; j++) {
