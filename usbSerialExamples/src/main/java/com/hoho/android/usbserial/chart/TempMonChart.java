@@ -59,12 +59,18 @@ public class TempMonChart extends ChartBase {
 
         //draw line
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.RED);
+        paint.setColor(getResources().getColor(R.color.bgLight));
+        float center = (mainRect.top + mainRect.bottom) / 2f;
+        canvas.drawLine(mainRect.left, center, mainRect.right, center, paint);;
 
         //reset paths
         for (int i = 0; i < pathList.length; i++) {
             pathList[i].reset();
         }
+
+        //reset maxmin
+        int maxT = DataConstants.TEMP_MIN;
+        int minT = DataConstants.TEMP_MAX;
 
         float x = mainRect.right;
         float y = (mainRect.top + mainRect.bottom) / 2f;
@@ -73,7 +79,28 @@ public class TempMonChart extends ChartBase {
             for (int i = voltageDataList.size() - 1; i >= 0; i--) {
                 VoltageDataPack voltageDataPack = voltageDataList.get(i);
                 for (int j = 0; j < TEMP_COUNT; j++) {
-                    y = mainRect.top + mainRect.height() * (DataConstants.TEMP_MAX - voltageDataPack.tempListDisplay[j]) / (DataConstants.TEMP_MAX - DataConstants.TEMP_MIN);
+                    int data = voltageDataPack.tempListDisplay[j];
+                    if (data < minT) {
+                        minT = data;
+                    }
+                    if (data > maxT) {
+                        maxT = data;
+                    }
+                }
+                x = x - xDiff;
+                if (x < mainRect.left) {
+                    break;
+                }
+            }
+            if (minT > maxT) {
+                minT = DataConstants.TEMP_MIN;
+                maxT = DataConstants.TEMP_MAX;
+            }
+            x = mainRect.right;
+            for (int i = voltageDataList.size() - 1; i >= 0; i--) {
+                VoltageDataPack voltageDataPack = voltageDataList.get(i);
+                for (int j = 0; j < TEMP_COUNT; j++) {
+                    y = mainRect.top + mainRect.height() * (maxT - voltageDataPack.tempListDisplay[j]) / (maxT - minT);
                     if (pathList[j].isEmpty()) {
                         pathList[j].moveTo(x, y);
                     } else {
@@ -87,11 +114,32 @@ public class TempMonChart extends ChartBase {
             }
         }
 
+        float maxP = DataConstants.PRESSURE_MIN;
+        float minP = DataConstants.PRESSURE_MAX;
         if (pressureDataList != null) {
             x = mainRect.right;
             for (int i = pressureDataList.size() - 1; i >= 0; i--) {
                 PressureDataPack pressureDataPack = pressureDataList.get(i);
-                y = mainRect.top + mainRect.height() * (DataConstants.PRESSURE_MAX - pressureDataPack.pressureDisplay) / (DataConstants.PRESSURE_MAX - DataConstants.PRESSURE_MIN);
+                float data = pressureDataPack.pressureDisplay;
+                if (data < minP) {
+                    minP = data;
+                }
+                if (data > maxP) {
+                    maxP = data;
+                }
+                x = x - xDiff;
+                if (x < mainRect.left) {
+                    break;
+                }
+            }
+            if (minP > maxP) {
+                minP = DataConstants.PRESSURE_MIN;
+                maxP = DataConstants.PRESSURE_MAX;
+            }
+            x = mainRect.right;
+            for (int i = pressureDataList.size() - 1; i >= 0; i--) {
+                PressureDataPack pressureDataPack = pressureDataList.get(i);
+                y = mainRect.top + mainRect.height() * (maxP - pressureDataPack.pressureDisplay) / (maxP - minP);
                 if (pathList[2].isEmpty()) {
                     pathList[2].moveTo(x, y);
                 } else {
@@ -116,10 +164,13 @@ public class TempMonChart extends ChartBase {
         paint.setAntiAlias(true);
         paint.setTextSize(Utils.dp2px(getContext(), 12));
         paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText(DataConstants.TEMP_MAX + "°C", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
-        canvas.drawText(DataConstants.TEMP_MIN + "°C", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(maxT + "°C", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(minT + "°C", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText((maxT + minT) / 2 + "°C", mainRect.left, center, paint);
         paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(DataConstants.PRESSURE_MAX + "Bar", mainRect.right, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(maxP + "Bar", mainRect.right, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(minP + "Bar", mainRect.right, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText((maxP + minP) / 2 + "Bar", mainRect.right, center, paint);
         if (voltageDataList.size() > 0) {
             try {
                 long lastTime = voltageDataList.get(voltageDataList.size() - 1).timestamp;

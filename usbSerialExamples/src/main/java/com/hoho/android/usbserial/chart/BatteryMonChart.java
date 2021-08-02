@@ -60,12 +60,18 @@ public class BatteryMonChart extends ChartBase {
 
         //draw line
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.RED);
+        paint.setColor(getResources().getColor(R.color.bgLight));
+        float center = (mainRect.top + mainRect.bottom) / 2f;
+        canvas.drawLine(mainRect.left, center, mainRect.right, center, paint);;
 
         //reset paths
         for (int i = 0; i < pathList.length; i++) {
             pathList[i].reset();
         }
+
+        //maxmin
+        float maxV = DataConstants.Battery_MinVol;
+        float minV = DataConstants.Battery_MaxVol;
 
         float x = mainRect.right;
         float y = (mainRect.top + mainRect.bottom) / 2f;
@@ -76,7 +82,28 @@ public class BatteryMonChart extends ChartBase {
         for (int i = voltageDataList.size() - 1; i >= 0; i--) {
             VoltageDataPack voltageDataPack = voltageDataList.get(i);
             for (int j = 0; j < BAT_COUNT; j++) {
-                y = mainRect.top + mainRect.height() * (DataConstants.Battery_MaxVol - voltageDataPack.voltageListDisplay[j]) / (DataConstants.Battery_MaxVol - DataConstants.Battery_MinVol);
+                float data = voltageDataPack.voltageListDisplay[j];
+                if (data < minV) {
+                    minV = data;
+                }
+                if (data > maxV) {
+                    maxV = data;
+                }
+            }
+            x = x - xDiff;
+            if (x < mainRect.left) {
+                break;
+            }
+        }
+        if (minV > maxV) {
+            minV = DataConstants.Battery_MinVol;
+            maxV = DataConstants.Battery_MaxVol;
+        }
+        x = mainRect.right;
+        for (int i = voltageDataList.size() - 1; i >= 0; i--) {
+            VoltageDataPack voltageDataPack = voltageDataList.get(i);
+            for (int j = 0; j < BAT_COUNT; j++) {
+                y = mainRect.top + mainRect.height() * (maxV - voltageDataPack.voltageListDisplay[j]) / (maxV - minV);
                 if (pathList[j].isEmpty()) {
                     pathList[j].moveTo(x, y);
                 } else {
@@ -100,8 +127,10 @@ public class BatteryMonChart extends ChartBase {
         paint.setColor(getResources().getColor(R.color.textColorDark));
         paint.setAntiAlias(true);
         paint.setTextSize(Utils.dp2px(getContext(), 12));
-        canvas.drawText(DataConstants.Battery_MaxVol + "V", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
-        canvas.drawText(DataConstants.Battery_MinVol + "V", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(maxV + "V", mainRect.left, mainRect.top + Utils.dp2px(getContext(), 12), paint);
+        canvas.drawText(minV + "V", mainRect.left, mainRect.bottom - Utils.dp2px(getContext(), 12), paint);
+        String centerV = String.format("%.4f", (maxV + minV) / 2);
+        canvas.drawText(centerV + "V", mainRect.left, center, paint);
         if (voltageDataList.size() > 0) {
             try {
                 long lastTime = voltageDataList.get(voltageDataList.size() - 1).timestamp;
